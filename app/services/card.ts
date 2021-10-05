@@ -7,7 +7,7 @@ class Card {
     url: 'info',
     headers: {
       'x-rapidapi-host': 'omgvamp-hearthstone-v1.p.rapidapi.com',
-      'x-rapidapi-key': 'a19852e8bfmsh934b970a1475291p1febc6jsn763992f393ef'
+      'x-rapidapi-key': process.env.RAPIDAPI_KEY
     }
   };
 
