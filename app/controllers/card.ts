@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { card } from '../services/card';
-import { CardInfo, Cards } from '../models/card';
+import { CardInfo, Cards } from '../../types/app/card';
 
 export function getInfo(_: Request, res: Response): void {
   card.info().then((result: CardInfo) => res.json(result));

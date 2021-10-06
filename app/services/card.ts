@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { CardInfo, Cards } from '../models/card';
+import { CardInfo, Cards } from '../../types/app/card';
 
 class Card {
   options: AxiosRequestConfig = {
