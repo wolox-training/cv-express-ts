@@ -8,13 +8,13 @@ describe('users', () => {
       {
         name: 'u1',
         lastName: 'ln1',
-        email: 'e1@e.c',
+        email: 'e1@wolox.co',
         password: 'xsw'
       },
       {
         name: 'u2',
         lastName: 'ln2',
-        email: 'e2@e.c',
+        email: 'e2@wolox.co',
         password: 'xsw'
       }
     ])
@@ -37,8 +37,8 @@ describe('users', () => {
         .send({
           name: 'u3',
           lastName: 'ln3',
-          email: 'e3@e.c',
-          password: 'xsw'
+          email: 'e3@wolox.co',
+          password: 'xswW1234'
         })
         .expect(201)
         .then(async () => {

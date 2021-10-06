@@ -1,9 +1,24 @@
+import bcrypt from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
 import HttpStatus from 'http-status-codes';
 
 import userService from '../services/users';
 import { User } from '../models/user';
 import { notFoundError } from '../errors';
+
+async function checkEmail(email: string): Promise<string> {
+  const regexpEmail = /@wolox.co/;
+  if (!regexpEmail.test(email)) {
+    return 'email does not belong to domain';
+  }
+  const user = await userService.findUser({ email });
+  return user ? 'the email is taken' : '';
+}
+
+function checkPassword(password: string): string {
+  const regexpPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  return regexpPassword.test(password) ? '' : 'invalid password';
+}
 
 export function getUsers(req: Request, res: Response, next: NextFunction): void {
   userService
@@ -12,13 +27,29 @@ export function getUsers(req: Request, res: Response, next: NextFunction): void 
     .catch(next);
 }
 
-export function createUser(req: Request, res: Response, next: NextFunction): void {
+export async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const data = req.body;
+  const errors: string[] = [];
+  const errorEmail = await checkEmail(data.email);
+  const errorPassword = checkPassword(data.password);
+  if (errorEmail) {
+    errors.push(errorEmail);
+  }
+  if (errorPassword) {
+    errors.push(errorPassword);
+  }
+  if (errors.length) {
+    res.status(HttpStatus.FORBIDDEN).json(errors);
+    return;
+  }
+  const salt: number = process.env.SALT_PASSWORD ? Number(process.env.SALT_PASSWORD) : 10;
+  const password = bcrypt.hashSync(data.password, salt);
   userService
     .createAndSave({
-      name: req.body.name,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: req.body.password
+      name: data.name,
+      lastName: data.lastName,
+      email: data.email,
+      password
     } as User)
     .then((user: User) => res.status(HttpStatus.CREATED).send({ user }))
     .catch(next);

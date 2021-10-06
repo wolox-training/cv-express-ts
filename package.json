@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "bcryptjs": "^2.4.3",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "express": "^4.17.1",
@@ -82,7 +82,7 @@
     "@types/axios": "^0.14.0",
     "@types/babel-core": "^6.25.6",
     "@types/babel-traverse": "^6.25.5",
-    "@types/bcryptjs": "^2.4.2",
+    "@types/bcrypt": "^5.0.0",
     "@types/bluebird": "^3.5.27",
     "@types/body-parser": "^1.19.0",
     "@types/cors": "^2.8.5",
