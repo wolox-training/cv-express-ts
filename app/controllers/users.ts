@@ -5,6 +5,7 @@ import HttpStatus from 'http-status-codes';
 import userService from '../services/users';
 import { User } from '../models/user';
 import { notFoundError } from '../errors';
+import logger from '../logger';
 
 async function checkEmail(email: string): Promise<string> {
   const regexpEmail = /@wolox.co/;
@@ -40,6 +41,7 @@ export async function createUser(req: Request, res: Response, next: NextFunction
   }
   if (errors.length) {
     res.status(HttpStatus.FORBIDDEN).json(errors);
+    logger.error(`error creating user: ${errors.join(', ')}`);
     return;
   }
   const salt: number = process.env.SALT_PASSWORD ? Number(process.env.SALT_PASSWORD) : 10;
@@ -51,8 +53,14 @@ export async function createUser(req: Request, res: Response, next: NextFunction
       email: data.email,
       password
     } as User)
-    .then((user: User) => res.status(HttpStatus.CREATED).send({ user }))
-    .catch(next);
+    .then((user: User) => {
+      res.status(HttpStatus.CREATED).send({ user });
+      logger.info(`user created with email: ${data.email}`);
+    })
+    .catch(() => {
+      logger.error('error save user in database');
+      next();
+    });
 }
 
 export function getUserById(req: Request, res: Response, next: NextFunction): void {
