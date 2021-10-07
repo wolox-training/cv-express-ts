@@ -14,7 +14,12 @@ export function getUsers(req: Request, res: Response, next: NextFunction): void 
 
 export function createUser(req: Request, res: Response, next: NextFunction): void {
   userService
-    .createAndSave({ username: req.body.username } as User)
+    .createAndSave({
+      name: req.body.name,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      password: req.body.password
+    } as User)
     .then((user: User) => res.status(HttpStatus.CREATED).send({ user }))
     .catch(next);
 }
