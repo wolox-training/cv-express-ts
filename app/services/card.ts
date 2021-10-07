@@ -12,7 +12,7 @@ const genericOptions: AxiosRequestConfig = {
 };
 
 function getUrl(endPorint: string): string {
-  return `https://${config}/${endPorint}`;
+  return `https://${config.common.hearthstone.url}/${endPorint}`;
 }
 
 async function genericQuery(endPoint: string): Promise<unknown> {
