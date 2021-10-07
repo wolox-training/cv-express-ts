@@ -4,7 +4,7 @@ export class UserModel1574858958271 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'Users',
+        name: 'users',
         columns: [
           { name: 'id', type: 'int', isPrimary: true, generationStrategy: 'increment', isGenerated: true },
           { name: 'name', type: 'varchar' },
@@ -15,16 +15,16 @@ export class UserModel1574858958271 implements MigrationInterface {
       })
     );
     await queryRunner.createUniqueConstraint(
-      'Users',
+      'users',
       new TableUnique({ columnNames: ['email'], name: 'email' })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropUniqueConstraint(
-      'User',
+      'users',
       new TableUnique({ columnNames: ['email'], name: 'email' })
     );
-    await queryRunner.dropTable('User');
+    await queryRunner.dropTable('users');
   }
 }
