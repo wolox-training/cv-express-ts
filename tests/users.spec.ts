@@ -68,9 +68,9 @@ describe('users', () => {
               email: 'e3@wolox.co',
               password: 'xswW1234'
             })
-            .expect(403)
+            .expect(409)
             .then((res: request.Response) => {
-              expect(res.body[0]).toBe('the email is taken');
+              expect(res.body.message).toBe('the email is taken');
               done();
             });
         });
@@ -84,9 +84,9 @@ describe('users', () => {
           email: 'e3@wolox.co',
           password: 'wW1234'
         })
-        .expect(403)
+        .expect(422)
         .then((res: request.Response) => {
-          expect(res.body[0]).toBe('insecure password');
+          expect(res.body.message).toBe('insecure password');
           done();
         });
     });
@@ -98,7 +98,7 @@ describe('users', () => {
           email: 'e3@wolox.co',
           password: 'qqqwW1234'
         })
-        .expect(404)
+        .expect(503)
         .then(() => {
           done();
         });
