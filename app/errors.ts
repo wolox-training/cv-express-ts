@@ -18,3 +18,12 @@ export const alreadyExistError = createInternalError(ALREADY_EXIST_ERROR, HTTP_C
 
 export const EXTERNAL_API_ERROR = 'external_api_error';
 export const externalApiError = createInternalError(EXTERNAL_API_ERROR, HTTP_CODES.NOT_FOUND);
+
+export const UNPROCESSABLE_ENTITY_ERROR = 'unprocessable_entity';
+export const unprocessableEntity = createInternalError(
+  UNPROCESSABLE_ENTITY_ERROR,
+  HTTP_CODES.UNPROCESSABLE_ENTITY
+);
+
+export const CONFLICT_ERROR = 'conflict_request';
+export const conflictRequest = createInternalError(CONFLICT_ERROR, HTTP_CODES.CONFLICT);
