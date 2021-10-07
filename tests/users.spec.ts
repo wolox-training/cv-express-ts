@@ -49,6 +49,60 @@ describe('users', () => {
           done();
         });
     });
+    it('email taken', (done: jest.DoneCallback) => {
+      request(app)
+        .post('/users')
+        .send({
+          name: 'u3',
+          lastName: 'ln3',
+          email: 'e3@wolox.co',
+          password: 'xswW1234'
+        })
+        .expect(201)
+        .then(() => {
+          request(app)
+            .post('/users')
+            .send({
+              name: 'u3',
+              lastName: 'ln3',
+              email: 'e3@wolox.co',
+              password: 'xswW1234'
+            })
+            .expect(403)
+            .then((res: request.Response) => {
+              expect(res.body[0]).toBe('the email is taken');
+              done();
+            });
+        });
+    });
+    it('insecure password', (done: jest.DoneCallback) => {
+      request(app)
+        .post('/users')
+        .send({
+          name: 'u3',
+          lastName: 'ln3',
+          email: 'e3@wolox.co',
+          password: 'wW1234'
+        })
+        .expect(403)
+        .then((res: request.Response) => {
+          expect(res.body[0]).toBe('insecure password');
+          done();
+        });
+    });
+    it('incomplete data', (done: jest.DoneCallback) => {
+      request(app)
+        .post('/users')
+        .send({
+          lastName: 'ln3',
+          email: 'e3@wolox.co',
+          password: 'qqqwW1234'
+        })
+        .expect(404)
+        .then(() => {
+          done();
+        });
+    });
     describe('/users/:id GET', () => {
       it('should return user with id 1', (done: jest.DoneCallback) => {
         request(app)

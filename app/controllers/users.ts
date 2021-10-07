@@ -18,7 +18,7 @@ async function checkEmail(email: string): Promise<string> {
 
 function checkPassword(password: string): string {
   const regexpPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-  return regexpPassword.test(password) ? '' : 'invalid password';
+  return regexpPassword.test(password) ? '' : 'insecure password';
 }
 
 export function getUsers(req: Request, res: Response, next: NextFunction): void {
