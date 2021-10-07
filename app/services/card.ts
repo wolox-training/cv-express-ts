@@ -1,17 +1,18 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { CardInfo, Cards } from '../../types/app/card';
+import config from '../../config';
 
 const genericOptions: AxiosRequestConfig = {
   method: 'GET',
   url: 'info',
   headers: {
-    'x-rapidapi-host': 'omgvamp-hearthstone-v1.p.rapidapi.com',
-    'x-rapidapi-key': process.env.RAPIDAPI_KEY
+    'x-rapidapi-host': config.common.hearthstone.url,
+    'x-rapidapi-key': config.common.hearthstone.key
   }
 };
 
 function getUrl(endPorint: string): string {
-  return `https://omgvamp-hearthstone-v1.p.rapidapi.com/${endPorint}`;
+  return `https://${config.common.hearthstone.url}/${endPorint}`;
 }
 
 async function genericQuery(endPoint: string): Promise<unknown> {

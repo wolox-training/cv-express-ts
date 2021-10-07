@@ -54,6 +54,10 @@ const config: IConfig = {
     session: {
       header_name: 'authorization',
       secret: process.env.NODE_API_SESSION_SECRET as string
+    },
+    hearthstone: {
+      url: process.env.RAPIDAPI_URL || '',
+      key: process.env.RAPIDAPI_KEY || ''
     }
   },
   todos: {
