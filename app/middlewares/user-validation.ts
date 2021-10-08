@@ -11,7 +11,7 @@ class User {
   lastName: string;
 
   @IsString()
-  @Matches(/@wolox.co/, { message: 'email does not belong to domain' })
+  @Matches(/@wolox\.co$/, { message: 'email does not belong to domain' })
   email: string;
 
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, { message: 'password too weak' })

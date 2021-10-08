@@ -1,4 +1,5 @@
 import request from 'supertest';
+
 import userRepository from '../app/services/users';
 import app from '../app';
 
@@ -55,24 +56,13 @@ describe('users', () => {
         .send({
           name: 'u3',
           lastName: 'ln3',
-          email: 'e3@wolox.co',
+          email: 'e1@wolox.co',
           password: 'xswW1234'
         })
-        .expect(201)
-        .then(() => {
-          request(app)
-            .post('/users')
-            .send({
-              name: 'u3',
-              lastName: 'ln3',
-              email: 'e3@wolox.co',
-              password: 'xswW1234'
-            })
-            .expect(409)
-            .then((res: request.Response) => {
-              expect(res.body.message).toBe('the email is taken');
-              done();
-            });
+        .expect(409)
+        .then((res: request.Response) => {
+          expect(res.body.message).toBe('the email is taken');
+          done();
         });
     });
     it('insecure password', (done: jest.DoneCallback) => {
@@ -125,5 +115,81 @@ describe('users', () => {
           });
       });
     });
+  });
+  describe('/users/sessions POST', () => {
+    it('should login user', (done: jest.DoneCallback) => {
+      request(app)
+        .post('/users')
+        .send({
+          name: 'u3',
+          lastName: 'ln3',
+          email: 'e3@wolox.co',
+          password: 'xswW1234'
+        })
+        .expect(201)
+        .then(() => {
+          request(app)
+            .post('/users/sessions')
+            .send({
+              email: 'e3@wolox.co',
+              password: 'xswW1234'
+            })
+            .expect(200)
+            .then((res: request.Response) => {
+              expect(res.body.token).toBeDefined();
+              done();
+            });
+        });
+    });
+    it('wrong password', (done: jest.DoneCallback) => {
+      request(app)
+        .post('/users')
+        .send({
+          name: 'u3',
+          lastName: 'ln3',
+          email: 'e3@wolox.co',
+          password: 'xswW1234'
+        })
+        .expect(201)
+        .then(() => {
+          request(app)
+            .post('/users/sessions')
+            .send({
+              email: 'e3@wolox.co',
+              password: 'xswW123'
+            })
+            .expect(401)
+            .then((res: request.Response) => {
+              expect(res.body.message).toBe('The account or password is incorrect');
+              done();
+            });
+        });
+    });
+    it('user does not exist', (done: jest.DoneCallback) => {
+      request(app)
+        .post('/users/sessions')
+        .send({
+          email: 'e3xx@wolox.co',
+          password: 'xswW1234'
+        })
+        .expect(401)
+        .then((res: request.Response) => {
+          expect(res.body.message).toBe('The account or password is incorrect');
+          done();
+        });
+    });
+  });
+  it('login with email that does not belong to domain', (done: jest.DoneCallback) => {
+    request(app)
+      .post('/users/sessions')
+      .send({
+        email: 'e3@wolox.com',
+        password: 'xswW123'
+      })
+      .expect(401)
+      .then((res: request.Response) => {
+        expect(res.body.message).toBe('incorrect data login');
+        done();
+      });
   });
 });
