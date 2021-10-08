@@ -14,14 +14,16 @@ import { ERROR_MESSAGE } from './constants/errors-message';
 export const init = (app: Application): void => {
   app.get('/health', healthCheck);
   app.get('/users', getUsers);
-  app.post('/users/sessions', [
-    schemaValidation(Login, ERROR_MESSAGE.USER_VALIDATION, HTTP_CODES.UNAUTHORIZED),
+  app.post(
+    '/users/sessions',
+    [schemaValidation(Login, ERROR_MESSAGE.USER_VALIDATION, HTTP_CODES.UNAUTHORIZED)],
     singIn
-  ]);
-  app.post('/users', [
-    schemaValidation(User, ERROR_MESSAGE.USER_CREATION, HTTP_CODES.UNPROCESSABLE_ENTITY),
+  );
+  app.post(
+    '/users',
+    [schemaValidation(User, ERROR_MESSAGE.USER_CREATION, HTTP_CODES.UNPROCESSABLE_ENTITY)],
     createUser
-  ]);
+  );
   app.get('/users/:id', getUserById);
   app.get('/todos', getTodos);
   app.get('/info', getInfo);

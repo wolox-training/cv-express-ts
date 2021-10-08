@@ -15,13 +15,14 @@ export async function singIn(req: Request, res: Response, next: NextFunction): P
     });
     const messageLoginFail = 'The account or password is incorrect';
     if (user) {
-      bcrypt
-        .compare(data.password, user.password)
-        .then(() => {
+      try {
+        await bcrypt.compare(data.password, user.password).then(() => {
           const token = tokenCreation(user);
           res.json({ token });
-        })
-        .catch(() => next(authenticationError(messageLoginFail)));
+        });
+      } catch (e) {
+        next(authenticationError(messageLoginFail));
+      }
     } else {
       next(authenticationError(messageLoginFail));
     }
