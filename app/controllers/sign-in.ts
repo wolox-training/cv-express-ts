@@ -1,12 +1,11 @@
 import bcrypt from 'bcrypt';
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jwt-simple';
 
 import userRepository from '../services/users';
 import { authenticationError, databaseError } from '../errors';
 import { LoginData } from '../../types/app/login-data';
-import config from '../../config';
 import logger from '../logger';
+import { tokenCreation } from '../utils/token-creation';
 
 export async function singIn(req: Request, res: Response, next: NextFunction): Promise<void> {
   const data: LoginData = req.body;
@@ -16,15 +15,13 @@ export async function singIn(req: Request, res: Response, next: NextFunction): P
     });
     const messageLoginFail = 'The account or password is incorrect';
     if (user) {
-      bcrypt.compare(data.password, user.password, (err: Error, result: boolean) => {
-        if (result) {
-          const login = { id: user.id, role: 'user' };
-          const token = jwt.encode(login, config.common.session.secret);
+      bcrypt
+        .compare(data.password, user.password)
+        .then(() => {
+          const token = tokenCreation(user);
           res.json({ token });
-        } else {
-          next(authenticationError(messageLoginFail));
-        }
-      });
+        })
+        .catch(() => next(authenticationError(messageLoginFail)));
     } else {
       next(authenticationError(messageLoginFail));
     }
