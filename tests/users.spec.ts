@@ -86,7 +86,7 @@ describe('users', () => {
         })
         .expect(422)
         .then((res: request.Response) => {
-          expect(res.body.message).toBe('insecure password');
+          expect(res.body.message[0]).toBe('password: password too weak');
           done();
         });
     });
@@ -98,7 +98,7 @@ describe('users', () => {
           email: 'e3@wolox.co',
           password: 'qqqwW1234'
         })
-        .expect(503)
+        .expect(422)
         .then(() => {
           done();
         });
