@@ -160,7 +160,7 @@ describe('users', () => {
             })
             .expect(401)
             .then((res: request.Response) => {
-              expect(res.body.message).toBe('The account or password is incorrect');
+              expect(res.body.errors[0]).toBe('password: The account or password is incorrect');
               done();
             });
         });
@@ -188,7 +188,7 @@ describe('users', () => {
       })
       .expect(401)
       .then((res: request.Response) => {
-        expect(res.body.message).toBe('The account or password is incorrect');
+        expect(res.body.errors[0]).toBe('email: The account or password is incorrect');
         done();
       });
   });
