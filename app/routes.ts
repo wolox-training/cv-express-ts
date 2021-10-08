@@ -10,9 +10,8 @@ import { singIn } from './controllers/sign-in';
 export const init = (app: Application): void => {
   app.get('/health', healthCheck);
   app.get('/users', getUsers);
-  app.post('/users', userValidation);
-  app.post('/users', createUser);
   app.post('/users/sessions', singIn);
+  app.post('/users', [userValidation, createUser]);
   app.get('/users/:id', getUserById);
   app.get('/todos', getTodos);
   app.get('/info', getInfo);
