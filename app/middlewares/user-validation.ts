@@ -1,7 +1,7 @@
-import { transformAndValidate } from 'class-transformer-validator';
-import { IsString, Matches, ValidationError } from 'class-validator';
-
+import { IsString, Matches } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
+
+import { requestValidation } from '../utils/request-validation';
 
 class User {
   @IsString()
@@ -18,19 +18,11 @@ class User {
   password: string;
 }
 
-export function userValidation(req: Request, res: Response, next: NextFunction): void {
-  transformAndValidate(User, req.body)
-    .then(() => {
-      next();
-    })
-    .catch((err: ValidationError[]) => {
-      const errors: string[] = [];
-      err.forEach((error: ValidationError) => {
-        if (error.constraints) {
-          const key = Object.keys(error.constraints)[0];
-          errors.push(`${error.property}: ${error.constraints[key]}`);
-        }
-      });
-      res.status(422).json({ message: errors });
-    });
+export async function userValidation(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const validationErrors = await requestValidation(User, req);
+  if (validationErrors) {
+    res.status(422).json({ message: 'user validation failed', errors: validationErrors });
+  } else {
+    next();
+  }
 }

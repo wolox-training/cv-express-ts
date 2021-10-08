@@ -86,7 +86,7 @@ describe('users', () => {
         })
         .expect(422)
         .then((res: request.Response) => {
-          expect(res.body.message[0]).toBe('password: password too weak');
+          expect(res.body.errors[0]).toBe('password: password too weak');
           done();
         });
     });
