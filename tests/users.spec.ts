@@ -188,7 +188,7 @@ describe('users', () => {
       })
       .expect(401)
       .then((res: request.Response) => {
-        expect(res.body.message).toBe('incorrect data login');
+        expect(res.body.message).toBe('The account or password is incorrect');
         done();
       });
   });
