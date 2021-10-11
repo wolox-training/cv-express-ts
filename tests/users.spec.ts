@@ -11,24 +11,52 @@ describe('users', () => {
         lastName: 'ln1',
         email: 'e1@wolox.co',
         password: 'xsw'
-      },
-      {
-        name: 'u2',
-        lastName: 'ln2',
-        email: 'e2@wolox.co',
-        password: 'xsw'
       }
     ])
   );
   describe('/users GET', () => {
     it('should return all users', (done: jest.DoneCallback) => {
-      request(app)
-        .get('/users')
-        .expect(200)
-        .then((res: request.Response) => {
-          expect(res.body.length).toBe(2);
-          done();
+      const list = [];
+      for (let i = 1; i < 9; i++) {
+        list.push({
+          name: `name${i}`,
+          lastName: `lastName${i}`,
+          email: `email${i}@wolox.co`,
+          password: 'ABcd01234'
         });
+      }
+      userRepository.createMany(list).then(() => {
+        request(app)
+          .post('/users/')
+          .send({
+            name: 'u3',
+            lastName: 'ln3',
+            email: 'e3@wolox.co',
+            password: 'xswW1234'
+          })
+          .expect(201)
+          .then(() => {
+            request(app)
+              .post('/users/sessions')
+              .send({
+                email: 'e3@wolox.co',
+                password: 'xswW1234'
+              })
+              .expect(200)
+              .then((res1: request.Response) => {
+                request(app)
+                  .get('/users')
+                  .set({ Authorization: res1.body.token })
+                  .query({ page: 2, limit: 3 })
+                  .expect(200)
+                  .then((res2: request.Response) => {
+                    expect(res2.body.length).toBe(3);
+                    expect(res2.body[0].name).toBe('name3');
+                    done();
+                  });
+              });
+          });
+      });
     });
   });
   describe('/users POST', () => {
