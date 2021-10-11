@@ -7,7 +7,14 @@ export function requestValidation<T extends object>(
   req: Request
 ): Promise<void | string[]> {
   return new Promise((resolve: Function) => {
-    transformAndValidate(classType, req.body)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let data: any = undefined;
+    if (req.method === 'POST') {
+      data = req.body;
+    } else if (req.method === 'GET') {
+      data = req.query;
+    }
+    transformAndValidate(classType, data)
       .then(() => {
         resolve();
       })

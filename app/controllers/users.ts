@@ -8,12 +8,26 @@ import { databaseError, notFoundError, unprocessableEntity } from '../errors';
 import logger from '../logger';
 import { checkPassword } from '../utils/check-password';
 import { checkEmail } from '../utils/check-email';
+import { ERROR_MESSAGE } from '../constants/errors-message';
 
 export function getUsers(req: Request, res: Response, next: NextFunction): void {
-  userService
-    .findAll()
-    .then((users: User[]) => res.send(users))
-    .catch(next);
+  const page = Number(req.query.page);
+  const take = Number(req.query.limit);
+  const skip = (page - 1) * take;
+  if (take && page >= 0) {
+    userService
+      .findAll({
+        skip,
+        take
+      })
+      .then((users: User[]) => res.send(users))
+      .catch((e: Error) => {
+        logger.error(e);
+        next(e);
+      });
+  } else {
+    res.send(unprocessableEntity(ERROR_MESSAGE.QUERY_USER));
+  }
 }
 
 export async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -40,7 +54,7 @@ export async function createUser(req: Request, res: Response, next: NextFunction
       password
     } as User)
     .then((user: User) => {
-      res.status(HttpStatus.CREATED).send({ user });
+      res.status(HttpStatus.CREATED).send({ id: user.id });
       logger.info(`user created with email: ${data.email}`);
     })
     .catch(() => {
