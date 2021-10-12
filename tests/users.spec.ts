@@ -1,23 +1,35 @@
 import request from 'supertest';
+import bcrypt from 'bcrypt';
 
 import userRepository from '../app/services/users';
 import app from '../app';
 
 describe('users', () => {
-  beforeEach(() =>
-    userRepository.createMany([
+  beforeEach(async (done: jest.DoneCallback) => {
+    const salt: number = process.env.SALT_PASSWORD ? Number(process.env.SALT_PASSWORD) : 10;
+    const password = bcrypt.hashSync('ABcd1234', salt);
+    await userRepository.createMany([
       {
         name: 'u1',
         lastName: 'ln1',
-        email: 'e1@wolox.co',
-        password: 'xsw'
+        email: 'adm1@wolox.co',
+        password,
+        role: 'admin'
+      },
+      {
+        name: 'u1',
+        lastName: 'ln1',
+        email: 'usr1@wolox.co',
+        password,
+        role: 'user'
       }
-    ])
-  );
+    ]);
+    done();
+  });
   describe('/users GET', () => {
     it('should return all users', (done: jest.DoneCallback) => {
       const list = [];
-      for (let i = 1; i < 9; i++) {
+      for (let i = 2; i < 9; i++) {
         list.push({
           name: `name${i}`,
           lastName: `lastName${i}`,
@@ -84,7 +96,7 @@ describe('users', () => {
         .send({
           name: 'u3',
           lastName: 'ln3',
-          email: 'e1@wolox.co',
+          email: 'usr1@wolox.co',
           password: 'xswW1234'
         })
         .expect(409)
@@ -142,6 +154,64 @@ describe('users', () => {
             done();
           });
       });
+    });
+  });
+  describe('/admin/users POST', () => {
+    it('create user admin', (done: jest.DoneCallback) => {
+      request(app)
+        .post('/users/sessions')
+        .send({
+          email: 'adm1@wolox.co',
+          password: 'ABcd1234'
+        })
+        .expect(200)
+        .then((res: request.Response) => {
+          if (res.body.token) {
+            const { token } = res.body;
+            request(app)
+              .post('/admin/users')
+              .set({ Authorization: token })
+              .send({
+                name: 'adm',
+                lastName: 'ln3',
+                email: 'adm2@wolox.co',
+                password: 'xswW1234'
+              })
+              .expect(201)
+              .then((res1: request.Response) => {
+                expect(res1.body.id).toBeDefined();
+                done();
+              });
+          }
+        });
+    });
+    it('try create user admin', (done: jest.DoneCallback) => {
+      request(app)
+        .post('/users/sessions')
+        .send({
+          email: 'usr1@wolox.co',
+          password: 'ABcd1234'
+        })
+        .expect(200)
+        .then((res: request.Response) => {
+          if (res.body.token) {
+            const { token } = res.body;
+            request(app)
+              .post('/admin/users')
+              .set({ Authorization: token })
+              .send({
+                name: 'adm',
+                lastName: 'ln3',
+                email: 'usrx5@wolox.co',
+                password: 'xswW1234'
+              })
+              .expect(401)
+              .then((res1: request.Response) => {
+                expect(res1.body.message).toBeDefined();
+                done();
+              });
+          }
+        });
     });
   });
   describe('/users/sessions POST', () => {

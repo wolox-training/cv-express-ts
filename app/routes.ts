@@ -11,7 +11,8 @@ import { User } from '../types/schema/user';
 import { HTTP_CODES } from './constants';
 import { Login } from '../types/schema/login';
 import { ERROR_MESSAGE } from './constants/errors-message';
-import { secure } from './middlewares/auth';
+import { roleAdmin, secure } from './middlewares/auth';
+import { ROLES } from './constants/app-contants';
 
 export const init = (app: Application): void => {
   app.get('/health', healthCheck);
@@ -28,10 +29,15 @@ export const init = (app: Application): void => {
   app.post(
     '/users',
     [schemaValidation(User, ERROR_MESSAGE.USER_CREATION, HTTP_CODES.UNPROCESSABLE_ENTITY)],
-    createUser
+    createUser(ROLES.USER)
   );
   app.get('/users/:id', getUserById);
   app.get('/todos', getTodos);
   app.get('/info', getInfo);
   app.get('/cards', getCards);
+  app.post(
+    '/admin/users',
+    [secure, roleAdmin, schemaValidation(User, ERROR_MESSAGE.USER_CREATION, HTTP_CODES.UNPROCESSABLE_ENTITY)],
+    createUser(ROLES.ADMIN)
+  );
 };
