@@ -6,9 +6,9 @@ import userService from '../services/users';
 import { User } from '../models/user';
 import { databaseError, notFoundError, unprocessableEntity } from '../errors';
 import logger from '../logger';
-import { checkPassword } from '../utils/check-password';
 import { checkEmail } from '../utils/check-email';
 import { ERROR_MESSAGE } from '../constants/errors-message';
+import { ROLES } from '../constants/app-contants';
 
 export function getUsers(req: Request, res: Response, next: NextFunction): void {
   const page = Number(req.query.page);
@@ -33,15 +33,9 @@ export function getUsers(req: Request, res: Response, next: NextFunction): void 
 export async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   const data = req.body;
   const errorEmail = await checkEmail(data.email);
-  const errorPassword = checkPassword(data.password);
   if (errorEmail) {
     logger.error(errorEmail.message);
     next(errorEmail);
-    return;
-  }
-  if (errorPassword) {
-    logger.error(errorPassword);
-    next(unprocessableEntity(errorPassword));
     return;
   }
   const salt: number = process.env.SALT_PASSWORD ? Number(process.env.SALT_PASSWORD) : 10;
@@ -51,7 +45,52 @@ export async function createUser(req: Request, res: Response, next: NextFunction
       name: data.name,
       lastName: data.lastName,
       email: data.email,
-      password
+      password,
+      role: ROLES.USER
+    } as User)
+    .then((user: User) => {
+      res.status(HttpStatus.CREATED).send({ id: user.id });
+      logger.info(`user created with email: ${data.email}`);
+    })
+    .catch(() => {
+      const msg = 'error save user in database';
+      logger.error(msg);
+      next(databaseError(msg));
+    });
+}
+
+export async function createUserAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const data = req.body;
+  const errorEmail = await checkEmail(data.email);
+  if (errorEmail) {
+    const user = await userService.findUser({ email: data.email });
+    if (user && user.role !== ROLES.ADMIN) {
+      user.role = ROLES.ADMIN;
+      try {
+        const userSaved = await userService.createAndSave(user);
+        res.status(HttpStatus.OK).send({ id: userSaved.id });
+        logger.info(`user ${userSaved.id} updated with role: ${ROLES.ADMIN}`);
+        return;
+      } catch (e) {
+        const msg = 'error save user in database';
+        logger.error(e);
+        next(databaseError(msg));
+        return;
+      }
+    }
+    logger.error(errorEmail.message);
+    next(errorEmail);
+    return;
+  }
+  const salt: number = process.env.SALT_PASSWORD ? Number(process.env.SALT_PASSWORD) : 10;
+  const password = bcrypt.hashSync(data.password, salt);
+  userService
+    .createAndSave({
+      name: data.name,
+      lastName: data.lastName,
+      email: data.email,
+      password,
+      role: ROLES.ADMIN
     } as User)
     .then((user: User) => {
       res.status(HttpStatus.CREATED).send({ id: user.id });
