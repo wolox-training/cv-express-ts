@@ -39,18 +39,17 @@ export function createUser(role: string): (req: Request, res: Response, next: Ne
         const user = await userService.findUser({ email: data.email });
         if (user && user.role !== ROLES.ADMIN) {
           user.role = ROLES.ADMIN;
-          await userService
-            .createAndSave(user)
-            .then((userSaved: User) => {
-              res.status(HttpStatus.OK).send({ id: userSaved.id });
-              logger.info(`user ${userSaved.id} updated with role: ${ROLES.ADMIN}`);
-            })
-            .catch(() => {
-              const msg = 'error save user in database';
-              logger.error(msg);
-              next(databaseError(msg));
-            });
-          return;
+          try {
+            const userSaved = await userService.createAndSave(user);
+            res.status(HttpStatus.OK).send({ id: userSaved.id });
+            logger.info(`user ${userSaved.id} updated with role: ${ROLES.ADMIN}`);
+            return;
+          } catch (e) {
+            const msg = 'error save user in database';
+            logger.error(e);
+            next(databaseError(msg));
+            return;
+          }
         }
       }
       logger.error(errorEmail.message);
