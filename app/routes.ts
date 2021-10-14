@@ -14,6 +14,7 @@ import { Login } from '../types/schema/login';
 import { ERROR_MESSAGE } from './constants/errors-message';
 import { secure } from './middlewares/auth';
 import { createDeck } from './controllers/deck';
+import { UserCard } from '../types/schema/user-card';
 
 export const init = (app: Application): void => {
   app.get('/health', healthCheck);
@@ -37,6 +38,11 @@ export const init = (app: Application): void => {
   app.get('/info', getInfo);
   app.get('/cards', getCards);
   app.post('/cards/:id', [secure], buyCard);
+  app.get(
+    '/cards/:id',
+    [secure, schemaValidation(UserCard, ERROR_MESSAGE.BUY_CARD, HTTP_CODES.UNPROCESSABLE_ENTITY)],
+    buyCard
+  );
   app.post(
     '/decks',
     [secure, schemaValidation(UserDeck, ERROR_MESSAGE.CREATE_DECK, HTTP_CODES.UNPROCESSABLE_ENTITY)],

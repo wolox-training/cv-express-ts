@@ -1,6 +1,6 @@
 import { IsNumberString } from 'class-validator';
 
-export class QueryUsers {
+export class UserCard {
   @IsNumberString()
   cardId: string;
 }
