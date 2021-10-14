@@ -1,5 +1,6 @@
 import { Application } from 'express';
 
+import { UserDeck } from '../types/schema/user-deck';
 import { QueryUsers } from '../types/schema/query-users';
 import { healthCheck } from './controllers/healthCheck';
 import { getUsers, getUserById, createUser } from './controllers/users';
@@ -12,6 +13,7 @@ import { HTTP_CODES } from './constants';
 import { Login } from '../types/schema/login';
 import { ERROR_MESSAGE } from './constants/errors-message';
 import { secure } from './middlewares/auth';
+import { createDeck } from './controllers/deck';
 
 export const init = (app: Application): void => {
   app.get('/health', healthCheck);
@@ -34,5 +36,10 @@ export const init = (app: Application): void => {
   app.get('/todos', getTodos);
   app.get('/info', getInfo);
   app.get('/cards', getCards);
-  app.get('/cards/:id', [secure], buyCard);
+  app.post('/cards/:id', [secure], buyCard);
+  app.post(
+    '/decks',
+    [secure, schemaValidation(UserDeck, ERROR_MESSAGE.CREATE_DECK, HTTP_CODES.UNPROCESSABLE_ENTITY)],
+    createDeck
+  );
 };
