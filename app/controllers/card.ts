@@ -23,14 +23,14 @@ export async function buyCard(req: Request, res: Response, next: NextFunction): 
     userId
   };
   try {
-    const card = await findUserCard(userCard);
+    let card = await findUserCard(userCard);
     if (card) {
       next(alreadyExistError('The user already has the card'));
       return;
     }
-    await createAndSave(userCard as UserCard);
-    res.status(HTTP_CODES.CREATED).send();
+    card = await createAndSave(userCard as UserCard);
+    res.status(HTTP_CODES.CREATED).send({ id: cardId });
   } catch (e) {
-    next(databaseError(''));
+    next(databaseError('error saving buy card'));
   }
 }
