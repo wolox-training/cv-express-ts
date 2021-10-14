@@ -4,7 +4,7 @@ import { QueryUsers } from '../types/schema/query-users';
 import { healthCheck } from './controllers/healthCheck';
 import { getUsers, getUserById, createUser } from './controllers/users';
 import { getTodos } from './controllers/todos';
-import { getCards, getInfo } from './controllers/card';
+import { buyCard, getCards, getInfo } from './controllers/card';
 import { singIn } from './controllers/sign-in';
 import { schemaValidation } from './middlewares/schema-validation';
 import { User } from '../types/schema/user';
@@ -34,4 +34,5 @@ export const init = (app: Application): void => {
   app.get('/todos', getTodos);
   app.get('/info', getInfo);
   app.get('/cards', getCards);
+  app.get('/cards/:id', [secure], buyCard);
 };
