@@ -12,6 +12,7 @@ import { HTTP_CODES } from './constants';
 import { Login } from '../types/schema/login';
 import { ERROR_MESSAGE } from './constants/errors-message';
 import { secure } from './middlewares/auth';
+import { UserCard } from '../types/schema/user-card';
 
 export const init = (app: Application): void => {
   app.get('/health', healthCheck);
@@ -34,5 +35,9 @@ export const init = (app: Application): void => {
   app.get('/todos', getTodos);
   app.get('/info', getInfo);
   app.get('/cards', getCards);
-  app.get('/cards/:id', [secure], buyCard);
+  app.get(
+    '/cards/:id',
+    [secure, schemaValidation(UserCard, ERROR_MESSAGE.BUY_CARD, HTTP_CODES.UNPROCESSABLE_ENTITY)],
+    buyCard
+  );
 };
