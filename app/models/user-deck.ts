@@ -5,8 +5,8 @@ export class UserDeck {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'card_set', type: 'varchar' })
-  cardSet: string;
+  @Column({ name: 'card_class', type: 'varchar' })
+  cardClass: string;
 
   @Column({ name: 'user_id', type: 'varchar' })
   userId: string;

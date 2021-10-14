@@ -4,11 +4,12 @@ import { alreadyExistError, databaseError } from '../errors';
 import { UserDeck } from '../models/user-deck';
 import { createAndSave, findUserDeck } from '../services/user-deck';
 import { HTTP_CODES } from '../constants';
-import { CARD_SET } from '../constants/card-set';
+import { info } from '../services/card';
 
 export async function createDeck(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const cardSet = req.body.deckName;
-  const cardSetExists = CARD_SET.some((name: string) => cardSet === name);
+  const cardClass = req.body.deckName;
+  const { classes } = await info();
+  const cardSetExists = classes.some((name: string) => cardClass === name);
   if (!cardSetExists) {
     next(alreadyExistError);
     return;
@@ -16,7 +17,7 @@ export async function createDeck(req: Request, res: Response, next: NextFunction
   const userId = req.user.id;
   const userDeck = {
     userId,
-    cardSet
+    cardClass
   };
   try {
     const card = await findUserDeck(userDeck);
@@ -27,6 +28,6 @@ export async function createDeck(req: Request, res: Response, next: NextFunction
     const deck = await createAndSave(userDeck as UserDeck);
     res.status(HTTP_CODES.CREATED).send({ id: deck.id });
   } catch (e) {
-    next(databaseError(''));
+    next(databaseError('error saving deck'));
   }
 }
