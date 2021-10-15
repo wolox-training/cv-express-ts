@@ -1,11 +1,12 @@
 import { Application } from 'express';
 
+import { AddCard } from '../types/schema/add-card';
 import { UserDeck } from '../types/schema/user-deck';
 import { QueryUsers } from '../types/schema/query-users';
 import { healthCheck } from './controllers/healthCheck';
 import { getUsers, getUserById, createUser } from './controllers/users';
 import { getTodos } from './controllers/todos';
-import { buyCard, getCards, getInfo } from './controllers/card';
+import { addCard, buyCard, getCards, getInfo } from './controllers/card';
 import { singIn } from './controllers/sign-in';
 import { schemaValidation } from './middlewares/schema-validation';
 import { User } from '../types/schema/user';
@@ -47,5 +48,10 @@ export const init = (app: Application): void => {
     '/decks',
     [secure, schemaValidation(UserDeck, ERROR_MESSAGE.CREATE_DECK, HTTP_CODES.UNPROCESSABLE_ENTITY)],
     createDeck
+  );
+  app.post(
+    '/decks/:deck_id/cards',
+    [secure, schemaValidation(AddCard, ERROR_MESSAGE.ADD_CARD, HTTP_CODES.UNPROCESSABLE_ENTITY)],
+    addCard
   );
 };

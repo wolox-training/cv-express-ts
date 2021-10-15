@@ -7,9 +7,9 @@ import { HTTP_CODES } from '../constants';
 import { info } from '../services/card';
 
 export async function createDeck(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const cardClass = req.body.deckName;
+  const { deckClass } = req.body;
   const { classes } = await info();
-  const cardSetExists = classes.some((name: string) => cardClass === name);
+  const cardSetExists = classes.some((name: string) => deckClass === name);
   if (!cardSetExists) {
     next(alreadyExistError);
     return;
@@ -17,7 +17,7 @@ export async function createDeck(req: Request, res: Response, next: NextFunction
   const userId = req.user.id;
   const userDeck = {
     userId,
-    cardClass
+    deckClass
   };
   try {
     const card = await findUserDeck(userDeck);

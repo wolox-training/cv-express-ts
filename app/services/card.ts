@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
-import { CardInfo, Cards } from '../../types/app/card';
+import { Card, CardInfo, Cards } from '../../types/app/card';
 import config from '../../config';
 
 const genericOptions: AxiosRequestConfig = {
@@ -29,4 +29,8 @@ export function info(): Promise<CardInfo> {
 
 export function cards(): Promise<Cards> {
   return genericQuery('allCards') as Promise<Cards>;
+}
+
+export function cardInfo(query: string): Promise<Card> {
+  return genericQuery(`cards/${query}`) as Promise<Card>;
 }

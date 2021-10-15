@@ -10,4 +10,7 @@ export class UserCard {
 
   @Column({ name: 'user_id', type: 'varchar' })
   userId: string;
+
+  @Column({ name: 'deck_class', type: 'varchar' })
+  deckClass: string;
 }

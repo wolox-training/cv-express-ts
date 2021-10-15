@@ -12,3 +12,15 @@ export interface CardInfo {
 export interface Cards {
   [key: string]: string[];
 }
+
+export interface Card {
+  cardId: string;
+  dbfId: string;
+  name: string;
+  cardSet: string;
+  type: string;
+  faction: string;
+  cost: number;
+  playerClass: string;
+  locale: string;
+}
